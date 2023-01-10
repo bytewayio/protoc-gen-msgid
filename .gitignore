@@ -1,0 +1,13 @@
+build/**
+*.iml
+**/.idea
+bin/**
+
+*.exe
+*.iml
+**/conf.ini
+pkg/**
+*.ts
+*.cs
+protoc-gen-msgid
+*.proto

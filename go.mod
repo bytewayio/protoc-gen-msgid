@@ -1,4 +1,4 @@
-module protoc-gen-msgid
+module github.com/bytewayio/protoc-gen-msgid
 
 go 1.19
 

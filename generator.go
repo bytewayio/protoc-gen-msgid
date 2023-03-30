@@ -13,8 +13,6 @@ import (
 	"log"
 	"os"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	protobuf "google.golang.org/protobuf/types/descriptorpb"
 	plugin "google.golang.org/protobuf/types/pluginpb"
 )
@@ -174,7 +172,7 @@ func (g *Generator) generateUnpackFile(file *protobuf.FileDescriptorProto) *plug
 	buf.WriteString(tab)
 	buf.WriteString("switch fromCmd {\n")
 	for _, msg := range file.GetMessageType() {
-		typeName := cases.Title(language.AmericanEnglish).String(msg.GetName())
+		typeName := msg.GetName()
 		// if !g.isMessageCandidate(typeName) {
 		// 	continue
 		// }
@@ -231,7 +229,7 @@ func (g *Generator) generatePackObjFile(file *protobuf.FileDescriptorProto) *plu
 
 		isFirstArgument := true
 		assignmentBuf := new(bytes.Buffer)
-		msgTypeName := cases.Title(language.AmericanEnglish).String(msg.GetName())
+		msgTypeName := msg.GetName()
 
 		buf.WriteString("func NewObj")
 
@@ -242,13 +240,13 @@ func (g *Generator) generatePackObjFile(file *protobuf.FileDescriptorProto) *plu
 				buf.WriteString(", ")
 			}
 
-			argumentName := cases.Title(language.AmericanEnglish).String(field.GetName())
+			argumentName := field.GetName()
 			buf.WriteString(argumentName)
 			buf.WriteByte(' ')
 			typeName, builtinType := g.typesMapping[field.GetType().String()]
 			repeatedField := field.GetLabel().String() == "LABEL_REPEATED"
 			if !builtinType {
-				typeName = "*" + cases.Title(language.AmericanEnglish).String(field.GetTypeName()[strings.LastIndex(field.GetTypeName(), ".")+1:])
+				typeName = "*" + field.GetTypeName()[strings.LastIndex(field.GetTypeName(), ".")+1:]
 			}
 
 			if repeatedField {
@@ -263,7 +261,7 @@ func (g *Generator) generatePackObjFile(file *protobuf.FileDescriptorProto) *plu
 			assignmentBuf.WriteString(": ")
 			if builtinType && !strings.HasPrefix(typeName, "[]") {
 				assignmentBuf.WriteString("proto.")
-				assignmentBuf.WriteString(cases.Title(language.AmericanEnglish).String(typeName))
+				assignmentBuf.WriteString(typeName)
 				assignmentBuf.WriteByte('(')
 				assignmentBuf.WriteString(argumentName)
 				assignmentBuf.WriteString("),\n")
@@ -331,7 +329,7 @@ func (g *Generator) generatePackFile(file *protobuf.FileDescriptorProto) *plugin
 
 		isFirstArgument := true
 		assignmentBuf := new(bytes.Buffer)
-		msgTypeName := cases.Title(language.AmericanEnglish).String(msg.GetName())
+		msgTypeName := msg.GetName()
 
 		buf.WriteString("func ")
 		buf.WriteString("NewMsg")
@@ -343,13 +341,13 @@ func (g *Generator) generatePackFile(file *protobuf.FileDescriptorProto) *plugin
 				buf.WriteString(", ")
 			}
 
-			argumentName := cases.Title(language.AmericanEnglish).String(field.GetName())
+			argumentName := field.GetName()
 			buf.WriteString(argumentName)
 			buf.WriteByte(' ')
 			typeName, builtinType := g.typesMapping[field.GetType().String()]
 			repeatedField := field.GetLabel().String() == "LABEL_REPEATED"
 			if !builtinType {
-				typeName = "*" + cases.Title(language.AmericanEnglish).String(field.GetTypeName()[strings.LastIndex(field.GetTypeName(), ".")+1:])
+				typeName = "*" + field.GetTypeName()[strings.LastIndex(field.GetTypeName(), ".")+1:]
 			}
 
 			if repeatedField {
@@ -364,7 +362,7 @@ func (g *Generator) generatePackFile(file *protobuf.FileDescriptorProto) *plugin
 			assignmentBuf.WriteString(": ")
 			if builtinType && !strings.HasPrefix(typeName, "[]") {
 				assignmentBuf.WriteString("proto.")
-				assignmentBuf.WriteString(cases.Title(language.AmericanEnglish).String(typeName))
+				assignmentBuf.WriteString(typeName)
 				assignmentBuf.WriteByte('(')
 				assignmentBuf.WriteString(argumentName)
 				assignmentBuf.WriteString("),\n")
@@ -439,7 +437,7 @@ func (g *Generator) generateCmdFile(file *protobuf.FileDescriptorProto) *plugin.
 	messageID := messageIDOffset + 1
 	for _, v := range file.GetMessageType() {
 		buf.WriteString("const Cmd_")
-		buf.WriteString(cases.Title(language.AmericanEnglish).String(v.GetName()))
+		buf.WriteString(v.GetName())
 		buf.WriteString(fmt.Sprintf(" = 0x%X\n", messageID))
 		messageID++
 	}
@@ -493,7 +491,7 @@ func (g *Generator) generateAsFile(file *protobuf.FileDescriptorProto) *plugin.C
 		buf.WriteString(tab)
 		buf.WriteString(tab)
 		buf.WriteString("public static const ")
-		buf.WriteString(cases.Title(language.AmericanEnglish).String(msg.GetName()))
+		buf.WriteString(msg.GetName())
 		buf.WriteString(fmt.Sprintf(" : int = 0x%X;\n", messageID))
 		messageID++
 	}
@@ -548,7 +546,7 @@ func (g *Generator) generateJavaFile(file *protobuf.FileDescriptorProto) *plugin
 	for _, msg := range file.GetMessageType() {
 		buf.WriteString(tab)
 		buf.WriteString("public static final int ")
-		buf.WriteString(cases.Title(language.AmericanEnglish).String(msg.GetName()))
+		buf.WriteString(msg.GetName())
 		buf.WriteString(fmt.Sprintf(" = 0x%X;\n", messageID))
 		messageID++
 	}
@@ -563,7 +561,7 @@ func (g *Generator) generateJavaFile(file *protobuf.FileDescriptorProto) *plugin
 		buf.WriteString(tab)
 		buf.WriteString(tab)
 		buf.WriteString("messageTypeToMessageNameMapping.put(")
-		buf.WriteString(cases.Title(language.AmericanEnglish).String(msg.GetName()))
+		buf.WriteString(msg.GetName())
 		buf.WriteString(", \"")
 		buf.WriteString(msg.GetName())
 		buf.WriteString("\");\n")
@@ -572,7 +570,7 @@ func (g *Generator) generateJavaFile(file *protobuf.FileDescriptorProto) *plugin
 		buf.WriteString("messageNameToMessageTypeMapping.put(\"")
 		buf.WriteString(msg.GetName())
 		buf.WriteString("\", ")
-		buf.WriteString(cases.Title(language.AmericanEnglish).String(msg.GetName()))
+		buf.WriteString(msg.GetName())
 		buf.WriteString(");\n")
 	}
 	buf.WriteString(tab)
@@ -639,7 +637,7 @@ func (g *Generator) generateCSharpFile(file *protobuf.FileDescriptorProto) *plug
 	for _, msg := range file.GetMessageType() {
 		buf.WriteString(tab)
 		buf.WriteString(tab)
-		buf.WriteString(cases.Title(language.AmericanEnglish).String(msg.GetName()))
+		buf.WriteString(msg.GetName())
 		buf.WriteString(fmt.Sprintf(" = 0x%X,\n", messageID))
 		messageID++
 	}
@@ -695,7 +693,7 @@ func (g *Generator) generateTypeScriptFile(file *protobuf.FileDescriptorProto) *
 	for _, msg := range file.GetMessageType() {
 		buf.WriteString(tab)
 		buf.WriteString(tab)
-		buf.WriteString(cases.Title(language.AmericanEnglish).String(msg.GetName()))
+		buf.WriteString(msg.GetName())
 		buf.WriteString(fmt.Sprintf(" = 0x%X,\n", messageID))
 		messageID++
 	}
